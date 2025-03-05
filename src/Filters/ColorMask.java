@@ -5,12 +5,16 @@ import Interfaces.PixelFilter;
 import core.DImage;
 import processing.core.PImage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ColorMask implements PixelFilter, Interactive {
     private int threshold;
     private int count;
-    short[] newcolorstoadd = new short[Integer.MAX_VALUE];
+    private List<Short> newcolorstoadd = new ArrayList();
     private int othercount = 0;
+    private boolean Keepthis;
 
     public ColorMask() {
         threshold = 50;
@@ -22,24 +26,36 @@ public class ColorMask implements PixelFilter, Interactive {
         short[][] blue = img.getBlueChannel();
         short[][] green = img.getGreenChannel();
         count = 0;
-        short[][][]thing =colorfullon(red,blue,green, count);
-        short[][] red1 = thing[0];
-        short[][] green2 = thing[1];
-        short[][] blue3 = thing[2];
-        img.setColorChannels(red1, green2, blue3);
+        short[][][] maskedColors = this.colorfullon(red, blue, green);
+        img.setColorChannels(maskedColors[0], maskedColors[1], maskedColors[2]);
         return img;
     }
-    public short[][][] colorfullon(short[][] red, short[][]blue, short[][] green, int count) {
+
+    public short[][][] colorfullon(short[][] red, short[][]blue, short[][] green) {
         for (int r = 0; r < red.length; r++) {
             for (int c = 0; c < red[r].length; c++) {
-                double reddist = ((newcolorstoadd[count] - red[r][c]) * (newcolorstoadd[count] - red[r][c]));
-                count++;
-                double bluedist = (newcolorstoadd[count] - blue[r][c]) * (newcolorstoadd[count] - blue[r][c]);
-                count++;
-                double greendist = (newcolorstoadd[count] - green[r][c]) * (newcolorstoadd[count] - green[r][c]);
-                double thing = reddist + bluedist + greendist;
-                double difference = Math.sqrt(thing);
-                if (difference > threshold) {
+                Keepthis = false;
+
+                for(int i = 0; i < this.newcolorstoadd.size(); i += 3) {
+                    short thisR = (Short) this.newcolorstoadd.get(i);
+                    short thisB = (Short) this.newcolorstoadd.get(i + 1);
+                    short thisG = (Short) this.newcolorstoadd.get(i + 2);
+
+                    double reddist = (double) ((thisR - red[r][c]) * (thisR - red[r][c]));
+                    double bluedist = (double) ((thisB - blue[r][c]) * (thisB - blue[r][c]));
+                    double greendist = (double) ((thisG - green[r][c]) * (thisG - green[r][c]));
+
+                    double thing = reddist + bluedist + greendist;
+                    double difference = Math.sqrt(thing);
+
+                    if (difference <= (double) this.threshold) {
+                        Keepthis = true;
+                        break;
+                    }
+                }
+
+
+                if (Keepthis==false) {
                     red[r][c] = 0;
                     blue[r][c]=0;
                     green[r][c]=0;
@@ -53,8 +69,7 @@ public class ColorMask implements PixelFilter, Interactive {
 
     @Override
     public void Keypressed(char key) {
-        if(key=='m')
-            System.out.println(threshold);
+
     }
 
     @Override
@@ -62,20 +77,9 @@ public class ColorMask implements PixelFilter, Interactive {
         short[][] red = img.getRedChannel();
         short[][] blue = img.getBlueChannel();
         short[][] green = img.getGreenChannel();
-        othercount=0;
-        if(count>1) {
-            short t = red[mouseY][mouseX];
-            short b = blue[mouseY][mouseX];
-            short g = green[mouseY][mouseX];
-            newcolorstoadd[othercount]=t;
-            othercount++;
-            newcolorstoadd[othercount]=b;
-            othercount++;
-            newcolorstoadd[othercount]=g;
-            othercount++;
-        }
-        count++;
-        System.out.println(count);
+        this.newcolorstoadd.add(red[mouseY][mouseX]);
+        this.newcolorstoadd.add(blue[mouseY][mouseX]);
+        this.newcolorstoadd.add(green[mouseY][mouseX]);
     }
 
     @Override
@@ -84,5 +88,9 @@ public class ColorMask implements PixelFilter, Interactive {
             threshold++;
         else if (key == 'o' && threshold > 0)
             threshold--;
+        else if (key == 'r') {
+            this.newcolorstoadd.clear();
+        } else if(key=='m')
+            System.out.println(threshold);
     }
 }
