@@ -4,21 +4,30 @@ import core.DImage;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BallTrackingAlgorithm {
 
-    public DImage trackImage(DImage img) throws Exception {
+
+    public static DImage trackImage(DImage img, List<Short> maskedColors) {
         short[][] imgBW = img.getBWPixelGrid();
         short[][] red = img.getRedChannel();
         short[][] green = img.getGreenChannel();
         short[][] blue = img.getBlueChannel();
 
+        // Colors array
+        List<Short> c = maskedColors;
 
-        // Do stuff with color channels here
-        int[] colors = {100, 120, 180};
+        int[] colors = new int[c.size()];  //This is the colors array
 
+        for (int color = 0; color < c.size(); color++) {
+            colors[color] = c.get(color);
+        }
+
+
+        //Finds centers and draws circle around ball
         int[][] centers = findAllCenters(imgBW, colors);
-        ArrayList<int[]> pointsOnTheOutline = findSquaresForEachBall(centers);
+        ArrayList<int[]> pointsOnTheOutline = findCirclesForEachBall(centers);
 
         for (int i = 0; i < pointsOnTheOutline.size(); i++) {
             int[] point = pointsOnTheOutline.get(i);
@@ -29,10 +38,10 @@ public class BallTrackingAlgorithm {
         return img;
     }
 
-    public ArrayList<int[]> findSquaresForEachBall(int[][] centers) {
+    public static ArrayList<int[]> findCirclesForEachBall(int[][] centers) {
         ArrayList<int[]> points = new ArrayList<>();
         for (int[] center : centers) {
-            ArrayList<int[]> p = findSquare(center[2], center); //center[2] is the radius.
+            ArrayList<int[]> p = findCircle(center[2], center); //center[2] is the radius.
 
             //Same as running for loop and adding all the elements in p to points.
             points.addAll(p);
@@ -40,8 +49,7 @@ public class BallTrackingAlgorithm {
 
         return points;
     }
-    //TODO Fix this method because it returns points in an unusable order. Return the points in the order (x, y).
-    public ArrayList<int[]> findSquare(int radius, int[] center){
+    public static ArrayList<int[]> findCircle(int radius, int[] center){
         ArrayList<int[]> arrayOfPointsOnSquare = new ArrayList<>();
 
         int xTranslation = center[0];
@@ -60,7 +68,7 @@ public class BallTrackingAlgorithm {
     }
 
 
-    public int[][] findAllCenters (short[][] img, int[] allColors) throws Exception {
+    public static int[][] findAllCenters (short[][] img, int[] allColors) {
         int[][] centers = new int[allColors.length][2];
         for (int color = 0; color < allColors.length; color++) {
             centers[color] = findCenterForOneColor(img, color);
@@ -69,7 +77,7 @@ public class BallTrackingAlgorithm {
         return centers;
     }
 
-    public int[] findCenterForOneColor(short[][] img, int color) throws Exception {
+    public static int[] findCenterForOneColor(short[][] img, int color) {
         int[] centers = null;
 
         int topPixel = -1;
@@ -99,14 +107,15 @@ public class BallTrackingAlgorithm {
             }
         }
 
-        if (centers == null) throw new Exception("findCenterForOneColor(): Centers are null for some reason.");
+        if (centers == null)
+            System.out.println("findCenterForOneColor(): Centers are null for some reason.");
 
         return centers;
     }
 
 
 
-    public boolean checkIfEndPixel(short[][] img, int row, int color){
+    public static boolean checkIfEndPixel(short[][] img, int row, int color){
         int countOfColoredPixels = 0;
         int thresholdOfColoredPixelsPerRow = 10;
         for (int c = 0; c < img[0].length; c++) {

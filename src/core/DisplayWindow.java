@@ -171,7 +171,11 @@ public class DisplayWindow extends PApplet {
     public void draw() {
         background(200);
         if (!paused) {
-            fetchImageAndApplyFilter();
+            try {
+                fetchImageAndApplyFilter();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         if (frame == null) return;
 
@@ -223,7 +227,7 @@ public class DisplayWindow extends PApplet {
         }
     }
 
-    private void fetchImageAndApplyFilter() {
+    private void fetchImageAndApplyFilter() throws Exception {
         if (source == IMAGE) {
             applyFilterToImage(inputImage.getPImage());
         }
@@ -271,7 +275,7 @@ public class DisplayWindow extends PApplet {
         }
     }
 
-    public void applyFilterToImage(PImage img) {
+    public void applyFilterToImage(PImage img) throws Exception {
         oldFilteredFrame = filteredFrame;
         loading = true;
 
@@ -282,7 +286,7 @@ public class DisplayWindow extends PApplet {
         loading = false;
     }
 
-    public void movieEvent(Movie m) {
+    public void movieEvent(Movie m) throws Exception {
         if (paused) return;
 
         oldFilteredFrame = filteredFrame;
@@ -296,7 +300,7 @@ public class DisplayWindow extends PApplet {
         loading = false;
     }
 
-    private DImage runFilters(DImage frameToFilter) {
+    private DImage runFilters(DImage frameToFilter) throws Exception {
         if (filter == null) {
             System.err.println("Error: Your filter is null!  You haven't defined one to use...");
             return filteredFrame;
@@ -313,7 +317,11 @@ public class DisplayWindow extends PApplet {
     public void keyReleased() {
         if (key == 'f' || key == 'F') {
             this.filter = selectNewFilterDialog();
-            fetchImageAndApplyFilter();
+            try {
+                fetchImageAndApplyFilter();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             paused = false; // hack hack; can we just apply new filter to current frame instead of unpausing?
         }
 

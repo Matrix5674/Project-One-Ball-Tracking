@@ -8,5 +8,5 @@ public interface PixelFilter {
      * @param img the image to filter
      * @return the filtered image
      */
-    public DImage processImage(DImage img);
+    public DImage processImage(DImage img) throws Exception;
 }
