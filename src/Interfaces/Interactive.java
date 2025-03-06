@@ -3,6 +3,8 @@ package Interfaces;
 import core.DImage;
 
 public interface Interactive {
+    void Keypressed(char key);
+
     /***
      * Action you wish to perform when the mouse is clicked or key is pressed.
      * For example, on mouseClicked you could store the color of the pixel where
