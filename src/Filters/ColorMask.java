@@ -3,7 +3,6 @@ package Filters;
 import Interfaces.Interactive;
 import Interfaces.PixelFilter;
 import core.DImage;
-import processing.core.PImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,7 @@ public class ColorMask implements PixelFilter, Interactive {
                 }
 
 
-                if (Keepthis==false) {
+                if (!Keepthis) {
                     red[r][c] = 0;
                     blue[r][c]=0;
                     green[r][c]=0;
