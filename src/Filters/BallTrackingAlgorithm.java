@@ -29,9 +29,8 @@ public class BallTrackingAlgorithm {
         int[][] centers = findAllCenters(imgBW, colors);
         ArrayList<int[]> pointsOnTheOutline = findCirclesForEachBall(centers);
 
-        for (int i = 0; i < pointsOnTheOutline.size(); i++) {
-            int[] point = pointsOnTheOutline.get(i);
-            red[ point[0] ][ point[1] ] = 255;
+        for (int[] point : pointsOnTheOutline) {
+            red[point[0]][point[1]] = 255;
         }
 
         img.setColorChannels(red, green, blue);
@@ -80,28 +79,28 @@ public class BallTrackingAlgorithm {
     public static int[] findCenterForOneColor(short[][] img, int color) {
         int[] centers = null;
 
-        int topPixel = -1;
-        int bottomPixel = -1;
-        int radiusOfCircle = -1;
-        int rowOfCenter = -1;
-        int colOfCenter = -1;
+        int[] topPixel = null;
+        int[] bottomPixel = null;
+        int radiusOfCircle;
+        int rowOfCenter;
+        int colOfCenter;
 
         for (int r = 0; r < img.length; r++) {
             for (int c = 0; c < img[r].length; c++) {
                 //Find the topmost pixel of the ball by looping over rows.
                 //Find loop over till you find another white pixel that doesn't have any white pixels adjacent to it.
                 //Find the pixel in between the points to determine the center
-                if (checkIfEndPixel(img, r, color) && topPixel == -1) {
-                    topPixel = img[r][c];
+                if (checkIfEndPixel(img, r, color) && topPixel == null) {
+                    topPixel = new int[]{r, c};
                 }
-                if (checkIfEndPixel(img, r, color) && topPixel != -1) {
-                    bottomPixel = img[r][c];
+                if (checkIfEndPixel(img, r, color) && topPixel != null) {
+                    bottomPixel = new int[]{r, c};
                 }
 
-                if (topPixel != -1 && bottomPixel != -1) {
-                    rowOfCenter = r/2;
+                if (topPixel != null && bottomPixel != null) {
+                    rowOfCenter = (topPixel[0]+bottomPixel[0]) /2;
                     colOfCenter = c;
-                    radiusOfCircle = rowOfCenter - r;
+                    radiusOfCircle = topPixel[0] - rowOfCenter;
                     centers = new int[]{rowOfCenter, colOfCenter, radiusOfCircle};
                 }
             }
@@ -120,7 +119,6 @@ public class BallTrackingAlgorithm {
         int thresholdOfColoredPixelsPerRow = 10;
         for (int c = 0; c < img[0].length; c++) {
             if (img[row][c] == color) countOfColoredPixels += 1;
-            if (countOfColoredPixels > thresholdOfColoredPixelsPerRow) return false;
         }
         return (countOfColoredPixels > 0 && countOfColoredPixels < thresholdOfColoredPixelsPerRow);
 
