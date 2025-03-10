@@ -12,23 +12,23 @@ import java.util.List;
 public class ColorMask implements PixelFilter, Interactive {
     private int threshold;
     private int count;
-    private ArrayList<Short> newcolorstoadd = new ArrayList<>();
+    private List<Short> newcolorstoadd = new ArrayList<>();
     private int othercount = 0;
     private boolean Keepthis;
 
     public ColorMask() {
-        threshold = 25;
+        threshold = 50;
         count=0;
     }
 
-    public DImage processImage(DImage img) {
+    public DImage processImage(DImage img){
         short[][] red = img.getRedChannel();
         short[][] blue = img.getBlueChannel();
         short[][] green = img.getGreenChannel();
         count = 0;
         short[][][] maskedColors = this.colorfullon(red, blue, green);
         img.setColorChannels(maskedColors[0], maskedColors[1], maskedColors[2]);
-        return img;
+        return BallTrackingAlgorithm.trackImage(img, newcolorstoadd);
     }
 
     public short[][][] colorfullon(short[][] red, short[][]blue, short[][] green) {
@@ -37,22 +37,23 @@ public class ColorMask implements PixelFilter, Interactive {
                 Keepthis = false;
 
                 for(int i = 0; i < this.newcolorstoadd.size(); i += 3) {
-                    short thisR =  this.newcolorstoadd.get(i);
-                    short thisB =  this.newcolorstoadd.get(i + 1);
-                    short thisG =  this.newcolorstoadd.get(i + 2);
+                    short thisR = (Short) this.newcolorstoadd.get(i);
+                    short thisB = (Short) this.newcolorstoadd.get(i + 1);
+                    short thisG = (Short) this.newcolorstoadd.get(i + 2);
 
-                    double reddist =((thisR - red[r][c]) * (thisR - red[r][c]));
-                    double bluedist = ((thisB - blue[r][c]) * (thisB - blue[r][c]));
-                    double greendist =  ((thisG - green[r][c]) * (thisG - green[r][c]));
+                    double reddist = (double) ((thisR - red[r][c]) * (thisR - red[r][c]));
+                    double bluedist = (double) ((thisB - blue[r][c]) * (thisB - blue[r][c]));
+                    double greendist = (double) ((thisG - green[r][c]) * (thisG - green[r][c]));
 
                     double thing = reddist + bluedist + greendist;
                     double difference = Math.sqrt(thing);
 
-                    if (difference <= threshold) {
+                    if (difference <= (double) this.threshold) {
                         Keepthis = true;
                         break;
                     }
                 }
+
 
                 if (Keepthis==false) {
                     red[r][c] = 0;
@@ -61,9 +62,14 @@ public class ColorMask implements PixelFilter, Interactive {
                 }
             }
         }
-        short[][][] thing = {red,green,blue};
+        short[][][] thing = {red,blue,green};
         count += 1;
         return thing;
+    }
+
+    @Override
+    public void Keypressed(char key) {
+
     }
 
     @Override
@@ -86,10 +92,5 @@ public class ColorMask implements PixelFilter, Interactive {
             this.newcolorstoadd.clear();
         } else if(key=='m')
             System.out.println(threshold);
-    }
-
-    @Override
-    public void Keypressed(char key) {
-
     }
 }
