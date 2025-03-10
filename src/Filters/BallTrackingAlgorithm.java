@@ -122,7 +122,8 @@ public class BallTrackingAlgorithm {
             if (img[row][c] == color) countOfColoredPixels += 1;
             if (countOfColoredPixels > thresholdOfColoredPixelsPerRow) return false;
         }
-        return true;
+        return (countOfColoredPixels > 0 && countOfColoredPixels < thresholdOfColoredPixelsPerRow);
+
     }
 
 
