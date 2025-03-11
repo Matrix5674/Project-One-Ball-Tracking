@@ -16,7 +16,7 @@ public class ColorMask implements PixelFilter, Interactive {
     private boolean Keepthis;
 
     public ColorMask() {
-        threshold = 50;
+        threshold = 30;
         count=0;
     }
 
@@ -25,8 +25,8 @@ public class ColorMask implements PixelFilter, Interactive {
         short[][] blue = img.getBlueChannel();
         short[][] green = img.getGreenChannel();
         count = 0;
-        short[][][] maskedColors = this.colorfullon(red, blue, green);
-        img.setColorChannels(maskedColors[0], maskedColors[1], maskedColors[2]);
+        short[][][] maskedColors = colorfullon(red, blue, green);
+        img.setColorChannels(maskedColors[0], maskedColors[2], maskedColors[1]);
         return BallTrackingAlgorithm.trackImage(img, newcolorstoadd);
     }
 
