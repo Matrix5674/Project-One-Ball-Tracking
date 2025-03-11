@@ -48,7 +48,8 @@ public class BallTrackingAlgorithm {
 
         return points;
     }
-    public static ArrayList<int[]> findCircle(int radius, int[] center){
+
+    public static ArrayList<int[]> findCircle(int radius, int[] center) {
         ArrayList<int[]> arrayOfPointsOnSquare = new ArrayList<>();
 
         int xTranslation = center[0];
@@ -61,13 +62,11 @@ public class BallTrackingAlgorithm {
             arrayOfPointsOnSquare.add(new int[]{PixelX, PixelY});
         }
 
-
-
         return arrayOfPointsOnSquare;
     }
 
 
-    public static int[][] findAllCenters (short[][] img, int[] allColors) {
+    public static int[][] findAllCenters(short[][] img, int[] allColors) {
         int[][] centers = new int[allColors.length][2];
         for (int color = 0; color < allColors.length; color++) {
             centers[color] = findCenterForOneColor(img, color);
@@ -85,29 +84,32 @@ public class BallTrackingAlgorithm {
         int rowOfCenter;
         int colOfCenter;
 
-        for (int r = 0; r < img.length; r++) {
-            for (int c = 0; c < img[r].length; c++) {
-                //Find the topmost pixel of the ball by looping over rows.
-                //Find loop over till you find another white pixel that doesn't have any white pixels adjacent to it.
-                //Find the pixel in between the points to determine the center
-                if (checkIfEndPixel(img, r, color) && topPixel == null) {
-                    topPixel = new int[]{r, c};
-                }
-                if (checkIfEndPixel(img, r, color) && topPixel != null) {
-                    bottomPixel = new int[]{r, c};
-                }
 
-                if (topPixel != null && bottomPixel != null) {
-                    rowOfCenter = (topPixel[0]+bottomPixel[0]) /2;
-                    colOfCenter = c;
-                    radiusOfCircle = topPixel[0] - rowOfCenter;
-                    centers = new int[]{rowOfCenter, colOfCenter, radiusOfCircle};
+        //Find the topmost pixel of the ball by looping over rows.
+        //Find loop over till you find another white pixel that doesn't have any white pixels adjacent to it.
+        //Find the pixel in between the points to determine the center
+
+            for (int r = 0; r < img.length; r++) {
+                for (int c = 0; c < img[r].length; c++) {
+                    if (checkIfEndPixel(img, r, color) && img[r][c] == color) {
+                        topPixel = new int[]{r, c};
+                    }
                 }
             }
-        }
 
-        if (centers == null)
-            System.out.println("findCenterForOneColor(): Centers are null for some reason.");
+            for (int r = img.length-1; r < 0; r++) {
+                for (int c = 0; c < img[r].length; c++) {
+                    if (checkIfEndPixel(img, r, color) && img[r][c] == color) {
+                        bottomPixel = new int[]{r, c};
+                    }
+                }
+            }
+
+        //Sets centers and returns an array of {r, c, radius}
+        rowOfCenter = (topPixel[0] + bottomPixel[0]) / 2;
+        colOfCenter = (topPixel[1] + bottomPixel[1]) / 2;
+        radiusOfCircle = topPixel[0] - rowOfCenter;
+        centers = new int[]{rowOfCenter, colOfCenter, radiusOfCircle};
 
         return centers;
     }
@@ -121,8 +123,6 @@ public class BallTrackingAlgorithm {
             if (img[row][c] == color) countOfColoredPixels += 1;
         }
         return (countOfColoredPixels > 0 && countOfColoredPixels < thresholdOfColoredPixelsPerRow);
-
     }
-
 
 }
