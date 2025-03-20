@@ -4,6 +4,7 @@ import core.DImage;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BallTrackingAlgorithm {
@@ -23,7 +24,7 @@ public class BallTrackingAlgorithm {
         for (int color = 0; color < c.size(); color++) {
             colors[color] = c.get(color);
         }
-
+        System.out.println(Arrays.toString(colors));
 
         //Finds centers and draws circle around ball
         int[][] centers = findAllCenters(imgBW, colors);
@@ -48,6 +49,7 @@ public class BallTrackingAlgorithm {
 
         return points;
     }
+
 
     public static ArrayList<int[]> findCircle(int radius, int[] center) {
         ArrayList<int[]> arrayOfPointsOnSquare = new ArrayList<>();
